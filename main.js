@@ -8,7 +8,7 @@ class Grafics1d {
     this.W = W;
     this.H = H;
     this.f = function (x) {
-      return x*x-9;
+      return Math.tan(x);
     }
     this.Float64Array = new Float64Array(this.W);
   }
@@ -42,29 +42,31 @@ class Grafics1d {
     canvas.width = this.W;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = background;
-    ctx.strokeRect(0, 0, this.W, this.H);
+    ctx.fillRect(0, 0, this.W, this.H);
+    ctx.fillText('(${this.xmin}, ${this.ymin})', 0, this.H, 50);
 
     ctx.beginPath();
+    ctx.lineWidth = 0.5;
     let Y = (this.ymax - this.ymin)*S2+this.H;
     for(let x = 0; x <= this.W; x += S1) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, Y+this.H);
     }
-    ctx.strokeStyle = '#b6b6b6';
     ctx.stroke();
     ctx.closePath();
 
     ctx.beginPath();
+    ctx.lineWidth = 0.5;
     let X = (this.xmax - this.xmin)*S1;
     for(let y = 0; y <= this.H; y -= S2) {
       ctx.moveTo(0, y);
       ctx.lineTo(X, y);
     }
-    ctx.strokeStyle = '#b6b6b6';
     ctx.stroke();
     ctx.closePath();
 
     ctx.beginPath();
+    ctx.lineWidth = 1.5;
     X = (0 - this.xmin)*S1;
     Y = this.H;
     ctx.moveTo(X, Y);
@@ -77,6 +79,7 @@ class Grafics1d {
     ctx.closePath();
 
     ctx.beginPath();
+    ctx.lineWidth = 1.5;
     X = 0;
     Y = (0-this.ymin)*S2+this.H;
     ctx.moveTo(X, Y);
@@ -89,6 +92,7 @@ class Grafics1d {
     ctx.closePath();
 
     ctx.beginPath();
+    ctx.lineWidth = 1.5;
     ctx.moveTo(0, (this.Float64Array[0]-this.ymin) * S2 + this.H);
     let i = 1;
     for(let x = this.xmin + dx; x <= this.xmax; x += dx) {
@@ -103,7 +107,8 @@ class Grafics1d {
     for(let x = this.xmin; x < this.xmax; x += dx) {
       X = (x-this.xmin)*S1;
       Y = (this.Float64Array[i]-this.ymin)*S2+this.H;
-      if(this.Float64Array[i] * this.Float64Array[i+1] < 0 && Math.abs(this.Float64Array[i] * this.Float64Array[i+1]) < Math.abs(this.ymax / 8)) {
+      if(this.Float64Array[i] * this.Float64Array[i+1] < 0 &&
+        Math.abs(this.Float64Array[i] * this.Float64Array[i+1]) < Math.abs(this.ymax / 8)) {
         ctx.beginPath();
         let Y2 = (this.Float64Array[i+1]-this.ymin)*S2+this.H;
         ctx.arc(X, Y, 2, 0, 2 * Math.PI);
