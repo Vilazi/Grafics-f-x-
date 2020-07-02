@@ -4,8 +4,8 @@ class Grafics1d {
     this.xmax = 10.0;
     this.ymin = -10.0;
     this.ymax = 10.0;
-    this.W = 400;
-    this.H = 400;
+    this.W = 800;
+    this.H = 600;
     this.f = function (x) {
       return x * x - 9;
     }
@@ -20,10 +20,9 @@ class Grafics1d {
     }
   }
   autodraw() {
-    var fmax = this.Float64Array[0];
-    var fmin = this.Float64Array[0];
-    let dx = (this.xmax - this.xmin) / this.W;
-    for(let i = this.xmin + dx; i < this.xmax; i += dx) {
+    let fmax = this.Float64Array[0];
+    let fmin = this.Float64Array[0];
+    for(let i = 1; i < this.Float64Array.length; i++) {
       fmax = Math.max(fmax, this.Float64Array[i]);
       fmin = Math.min(fmin, this.Float64Array[i]);
     }
@@ -43,9 +42,8 @@ class Grafics1d {
     ctx.strokeRect(0, 0, this.W, this.H);
 
     ctx.beginPath();
-    let Y = -(this.ymax - this.ymin)*S2+this.H;
+    let Y = (this.ymax - this.ymin)*S2+this.H;
     for(let x = 0; x <= this.W; x += S1) {
-
       ctx.moveTo(x, 0);
       ctx.lineTo(x, Y+this.H);
     }
@@ -55,7 +53,7 @@ class Grafics1d {
 
     ctx.beginPath();
     let X = (this.xmax - this.xmin)*S1;
-    for(let y = 0; y <= this.H; y += -S2) {
+    for(let y = 0; y <= this.H; y -= S2) {
       ctx.moveTo(0, y);
       ctx.lineTo(X, y);
     }
@@ -99,12 +97,14 @@ class Grafics1d {
     ctx.closePath();
 
     i = 0;
-    for(let x = this.xmin; x <= this.xmax; x += dx) {
+    for(let x = this.xmin; x < this.xmax; x += dx) {
       X = (x-this.xmin)*S1;
       Y = (this.Float64Array[i]-this.ymin)*S2+this.H;
-      if(Math.abs(this.Float64Array[i]) <= dy) {
+      if(this.Float64Array[i] * this.Float64Array[i+1] < 0 && Math.abs(this.Float64Array[i] * this.Float64Array[i+1]) < Math.abs(this.ymax / 8)) {
         ctx.beginPath();
+        let Y2 = (this.Float64Array[i+1]-this.ymin)*S2+this.H;
         ctx.arc(X, Y, 2, 0, 2 * Math.PI);
+        ctx.arc(X, Y2, 2, 0, 2 * Math.PI);
         ctx.fillStyle = 'indigo';
         ctx.fill();
         ctx.closePath();
@@ -115,8 +115,8 @@ class Grafics1d {
     i = 0;
     for(let x = this.xmin; x < this.xmax; x += dx) {
       X = (x-this.xmin)*S1;
-      if((this.Float64Array[i] > this.ymax / 3 && this.Float64Array[i + 1] < this.ymin / 3) ||
-        (this.Float64Array[i] < this.ymin / 3 && this.Float64Array[i + 1] > this.ymax / 3)) {
+      if((this.Float64Array[i] > this.ymax / 16 && this.Float64Array[i + 1] < this.ymin / 16) ||
+        (this.Float64Array[i] < this.ymin / 16 && this.Float64Array[i + 1] > this.ymax / 16)) {
         ctx.beginPath();
         X = (x-this.xmin)*S1;
         Y = (0-this.ymin)*S2+this.H;
@@ -131,6 +131,6 @@ class Grafics1d {
 }
 let grafic = new Grafics1d();
 grafic.evaluate();
-// grafic.autodraw();
+grafic.autodraw();
 grafic.draw();
 
