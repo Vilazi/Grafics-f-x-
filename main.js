@@ -8,7 +8,7 @@ class Grafics1d {
     this.W = W;
     this.H = H;
     this.f = function (x) {
-      return Math.tan(x);
+      return x*1/Math.tan(x);
     }
     this.Float64Array = new Float64Array(this.W);
   }
@@ -43,7 +43,6 @@ class Grafics1d {
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, this.W, this.H);
-    ctx.fillText('(${this.xmin}, ${this.ymin})', 0, this.H, 50);
 
     ctx.beginPath();
     ctx.lineWidth = 0.5;
@@ -135,10 +134,15 @@ class Grafics1d {
       }
       i++;
     }
+    ctx.fillStyle = 'white';
+    ctx.font = "30px bold";
+    let s1 ='(' + this.xmin + ', ' + this.ymin + ')', s2 = '(' + this.xmax + ', ' + this.ymax + ')';
+    ctx.fillText(s1, 0, this.H - 10);
+    ctx.fillText(s2, this.W - 100, 30);
   }
 }
 let grafic = new Grafics1d(-10, 10, -10, 10, 800, 600);
 grafic.evaluate();
-grafic.autodraw();
+// grafic.autodraw();
 grafic.draw();
 
