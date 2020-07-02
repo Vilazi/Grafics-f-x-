@@ -109,8 +109,7 @@ class Grafics1d {
       if(this.Float64Array[i] * this.Float64Array[i+1] < 0 &&
         Math.abs(this.Float64Array[i] * this.Float64Array[i+1]) < Math.abs(this.ymax / 8)) {
         ctx.beginPath();
-        let Y2 = (this.Float64Array[i+1]-this.ymin)*S2+this.H;
-        ctx.arc(X, Y, 2, 0, 2 * Math.PI);
+        let Y2 = (0-this.ymin)*S2+this.H;
         ctx.arc(X, Y2, 2, 0, 2 * Math.PI);
         ctx.fillStyle = nulls;
         ctx.fill();
