@@ -1,13 +1,14 @@
 class Grafics1d {
-  constructor() {
-    this.xmin = -10.0;
-    this.xmax = 10.0;
-    this.ymin = -10.0;
-    this.ymax = 10.0;
-    this.W = 800;
-    this.H = 600;
+  constructor(xmin = -10, xmax = 10, ymin = -10,
+              ymax = 10, W = 120, H = 100) {
+    this.xmin = xmin;
+    this.xmax = xmax;
+    this.ymin = ymin;
+    this.ymax = ymax;
+    this.W = W;
+    this.H = H;
     this.f = function (x) {
-      return x * x - 9;
+      return x*x-9;
     }
     this.Float64Array = new Float64Array(this.W);
   }
@@ -29,7 +30,8 @@ class Grafics1d {
     this.ymax = fmax;
     this.ymin = fmin;
   }
-  draw() {
+  draw(fun = 'red', coordLines = 'green', nulls = 'indigo',
+       breaks = 'magenta', background = 'grey') {
     let dx = (this.xmax - this.xmin) / this.W;
     let dy = (this.ymax - this.ymin) / this.H;
     let S1 = this.W / (this.xmax - this.xmin);
@@ -39,6 +41,7 @@ class Grafics1d {
     canvas.height = this.H;
     canvas.width = this.W;
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = background;
     ctx.strokeRect(0, 0, this.W, this.H);
 
     ctx.beginPath();
@@ -69,7 +72,7 @@ class Grafics1d {
       Y = (y-this.ymin)*S2+this.H;
       ctx.lineTo(X, Y);
     }
-    ctx.strokeStyle = '#1a6619';
+    ctx.strokeStyle = coordLines;
     ctx.stroke();
     ctx.closePath();
 
@@ -81,7 +84,7 @@ class Grafics1d {
       X = (x-this.xmin)*S1;
       ctx.lineTo(X, Y);
     }
-    ctx.strokeStyle = '#1a6619';
+    ctx.strokeStyle = coordLines;
     ctx.stroke();
     ctx.closePath();
 
@@ -92,7 +95,7 @@ class Grafics1d {
       ctx.lineTo((x-this.xmin)*S1, (this.Float64Array[i]-this.ymin)*S2+this.H);
       i++;
     }
-    ctx.strokeStyle = 'red';
+    ctx.strokeStyle = fun;
     ctx.stroke();
     ctx.closePath();
 
@@ -105,7 +108,7 @@ class Grafics1d {
         let Y2 = (this.Float64Array[i+1]-this.ymin)*S2+this.H;
         ctx.arc(X, Y, 2, 0, 2 * Math.PI);
         ctx.arc(X, Y2, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = 'indigo';
+        ctx.fillStyle = nulls;
         ctx.fill();
         ctx.closePath();
       }
@@ -121,7 +124,7 @@ class Grafics1d {
         X = (x-this.xmin)*S1;
         Y = (0-this.ymin)*S2+this.H;
         ctx.arc(X, Y, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = 'magenta';
+        ctx.fillStyle = breaks;
         ctx.fill();
         ctx.closePath();
       }
@@ -129,7 +132,7 @@ class Grafics1d {
     }
   }
 }
-let grafic = new Grafics1d();
+let grafic = new Grafics1d(-10, 10, -10, 10, 800, 600);
 grafic.evaluate();
 grafic.autodraw();
 grafic.draw();
