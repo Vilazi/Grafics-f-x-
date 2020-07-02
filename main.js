@@ -4,8 +4,8 @@ class Grafics1d {
     this.xmax = 10.0;
     this.ymin = -10.0;
     this.ymax = 10.0;
-    this.W = 120;
-    this.H = 100;
+    this.W = 400;
+    this.H = 400;
     this.f = function (x) {
       return x * x - 9;
     }
@@ -22,7 +22,8 @@ class Grafics1d {
   autodraw() {
     var fmax = this.Float64Array[0];
     var fmin = this.Float64Array[0];
-    for(let i = this.xmin; i < this.xmax; i += 0.1) {
+    let dx = (this.xmax - this.xmin) / this.W;
+    for(let i = this.xmin + dx; i < this.xmax; i += dx) {
       fmax = Math.max(fmax, this.Float64Array[i]);
       fmin = Math.min(fmin, this.Float64Array[i]);
     }
@@ -30,32 +31,106 @@ class Grafics1d {
     this.ymin = fmin;
   }
   draw() {
-    var canvas = document.getElementById('canvas');
-    var ctx = canvas.getContext('2d');
-    ctx.strokeRect(0, 0, this.W, this.H);
-    ctx.beginPath();
-    ctx.moveTo(0, this.H/2);
-    ctx.lineTo(this.W, this.H/2);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(this.W/2, 0);
-    ctx.lineTo(this.W/2, this.H);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.beginPath();
-    // ctx.transform((this.xmax - this.xmin) / this.W, 0, 0, (this.ymax - this.ymin) / this.H, this.xmin, this.ymin);
-    ctx.moveTo(0, 0);
-    let j = 1;
     let dx = (this.xmax - this.xmin) / this.W;
-    for(let x = this.xmin + dx; x <= this.xmax; x += dx) {
-      ctx.lineTo((x-this.xmin)*this.W/(this.xmax-this.xmin), (this.Float64Array[j]-this.ymax)*this.H/(this.ymin-this.ymax));
-      j++;
+    let dy = (this.ymax - this.ymin) / this.H;
+    let S1 = this.W / (this.xmax - this.xmin);
+    let S2 = this.H / (this.ymin - this.ymax);
+
+    const canvas = document.getElementById('canvas');
+    canvas.height = this.H;
+    canvas.width = this.W;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeRect(0, 0, this.W, this.H);
+
+    ctx.beginPath();
+    let Y = -(this.ymax - this.ymin)*S2+this.H;
+    for(let x = 0; x <= this.W; x += S1) {
+
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, Y+this.H);
     }
+    ctx.strokeStyle = '#b6b6b6';
     ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    let X = (this.xmax - this.xmin)*S1;
+    for(let y = 0; y <= this.H; y += -S2) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(X, y);
+    }
+    ctx.strokeStyle = '#b6b6b6';
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    X = (0 - this.xmin)*S1;
+    Y = this.H;
+    ctx.moveTo(X, Y);
+    for(let y = this.ymin; y <= this.ymax; y += dy) {
+      Y = (y-this.ymin)*S2+this.H;
+      ctx.lineTo(X, Y);
+    }
+    ctx.strokeStyle = '#1a6619';
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    X = 0;
+    Y = (0-this.ymin)*S2+this.H;
+    ctx.moveTo(X, Y);
+    for(let x = this.xmin; x <= this.xmax; x += dx) {
+      X = (x-this.xmin)*S1;
+      ctx.lineTo(X, Y);
+    }
+    ctx.strokeStyle = '#1a6619';
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.moveTo(0, (this.Float64Array[0]-this.ymin) * S2 + this.H);
+    let i = 1;
+    for(let x = this.xmin + dx; x <= this.xmax; x += dx) {
+      ctx.lineTo((x-this.xmin)*S1, (this.Float64Array[i]-this.ymin)*S2+this.H);
+      i++;
+    }
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+    ctx.closePath();
+
+    i = 0;
+    for(let x = this.xmin; x <= this.xmax; x += dx) {
+      X = (x-this.xmin)*S1;
+      Y = (this.Float64Array[i]-this.ymin)*S2+this.H;
+      if(Math.abs(this.Float64Array[i]) <= dy) {
+        ctx.beginPath();
+        ctx.arc(X, Y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = 'indigo';
+        ctx.fill();
+        ctx.closePath();
+      }
+      i++;
+    }
+
+    i = 0;
+    for(let x = this.xmin; x < this.xmax; x += dx) {
+      X = (x-this.xmin)*S1;
+      if((this.Float64Array[i] > this.ymax / 3 && this.Float64Array[i + 1] < this.ymin / 3) ||
+        (this.Float64Array[i] < this.ymin / 3 && this.Float64Array[i + 1] > this.ymax / 3)) {
+        ctx.beginPath();
+        X = (x-this.xmin)*S1;
+        Y = (0-this.ymin)*S2+this.H;
+        ctx.arc(X, Y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = 'magenta';
+        ctx.fill();
+        ctx.closePath();
+      }
+      i++;
+    }
   }
 }
-var grafic = new Grafics1d();
+let grafic = new Grafics1d();
 grafic.evaluate();
+// grafic.autodraw();
 grafic.draw();
 
