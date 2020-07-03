@@ -7,8 +7,18 @@
 </head>
 
 <body>
-  <canvas id="canvas" height="300" width="400"></canvas>
-  <script src="main.js"></script>
+  <h1>Захаренко Владимир. Задача 2.1</h1>
+  <p>Set minimum x coordinate value: <input name="parameters" id="xmin" maxlength="40" autocomplete="on" value="-10"></p>
+  <p>Set maximum x coordinate value: <input name="parameters" id="xmax" maxlength="40" autocomplete="on" value="10"></p>
+  <p>Set minimum y coordinate value: <input name="parameters" id="ymin" maxlength="40" autocomplete="on" value="-10"></p>
+  <p>Set maximum y coordinate value: <input name="parameters" id="ymax" maxlength="40" autocomplete="on" value="10"></p>
+  <p>Set width: <input name="parameters" id="width" maxlength="40" autocomplete="on" value="120"></p>
+  <p>Set height: <input name="parameters" id="height" maxlength="40" autocomplete="on" value="100"></p>
+  <p>Set function: <input name="parameters" id="function" maxlength="200" autocomplete="on" value="x*x-9"></p>
+  <script src="script.js"></script>
+  <p><input type="button" onclick="printPicture();" value="Build a graph"></p>
+  <p><input type="button" onclick="if(typeof grafic != 'undefined') Autodraw(grafic);" value="Set min and max y coordinate values as min and max function values"></p>
+  <canvas id="canvas"></canvas>
 </body>
 
 </html>
