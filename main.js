@@ -7,9 +7,9 @@ class Grafics1d {
     this.ymax = ymax;
     this.W = W;
     this.H = H;
-    this.f = function (x) {
-      return x*1/Math.tan(x);
-    }
+    this.f = function f(x) {
+      return eval(document.getElementById('function').value);
+    };
     this.Float64Array = new Float64Array(this.W);
   }
   evaluate() {
@@ -44,10 +44,29 @@ class Grafics1d {
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, this.W, this.H);
 
+    // Grades
     ctx.beginPath();
     ctx.lineWidth = 0.5;
     let Y = (this.ymax - this.ymin)*S2+this.H;
-    for(let x = 0; x <= this.W; x += S1) {
+    let Sx = S1;
+    let T1 = 1;
+    if(Sx < 15) {
+      while(Sx < 15) {
+        Sx *= 2;
+        T1 *= 2;
+      }
+    }
+    else if(Sx > 80) {
+      while(Sx > 80) {
+        Sx /= 2;
+        T1 /= 2;
+      }
+    }
+    for(let x = (0-this.xmin)*S1; x <= this.W; x += Sx) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, Y+this.H);
+    }
+    for(let x = (0-this.xmin)*S1; x >= 0; x -= Sx) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, Y+this.H);
     }
@@ -57,13 +76,32 @@ class Grafics1d {
     ctx.beginPath();
     ctx.lineWidth = 0.5;
     let X = (this.xmax - this.xmin)*S1;
-    for(let y = 0; y <= this.H; y -= S2) {
+    let Sy = -S2;
+    let T2 = 1;
+    if(Sy < 15) {
+      while(Sy < 15) {
+        Sy *= 2;
+        T2 *= 2;
+      }
+    }
+    else if(Sy > 80) {
+      while(Sy > 80) {
+        Sy /= 2;
+        T2 /= 2;
+      }
+    }
+    for(let y = (0-this.ymin)*S2+this.H; y <= this.H; y += Sy) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(X, y);
+    }
+    for(let y = (0-this.ymin)*S2+this.H; y >= 0; y -= Sy) {
       ctx.moveTo(0, y);
       ctx.lineTo(X, y);
     }
     ctx.stroke();
     ctx.closePath();
 
+    // Axes
     ctx.beginPath();
     ctx.lineWidth = 1.5;
     X = (0 - this.xmin)*S1;
@@ -90,18 +128,37 @@ class Grafics1d {
     ctx.stroke();
     ctx.closePath();
 
+    // Function
     ctx.beginPath();
     ctx.lineWidth = 1.5;
+    ctx.strokeStyle = fun;
     ctx.moveTo(0, (this.Float64Array[0]-this.ymin) * S2 + this.H);
     let i = 1;
     for(let x = this.xmin + dx; x <= this.xmax; x += dx) {
-      ctx.lineTo((x-this.xmin)*S1, (this.Float64Array[i]-this.ymin)*S2+this.H);
+      ctx.lineTo((x - this.xmin) * S1, (this.Float64Array[i] - this.ymin) * S2 + this.H);
       i++;
     }
-    ctx.strokeStyle = fun;
     ctx.stroke();
     ctx.closePath();
 
+    // Breaks
+    i = 0;
+    for(let x = this.xmin; x < this.xmax; x += dx) {
+       X = (x-this.xmin)*S1;
+       if((this.Float64Array[i] > this.ymax / 16 && this.Float64Array[i + 1] < this.ymin / 16) ||
+         (this.Float64Array[i] < this.ymin / 16 && this.Float64Array[i + 1] > this.ymax / 16)) {
+         ctx.beginPath();
+         X = (x-this.xmin)*S1;
+         Y = (0-this.ymin)*S2+this.H;
+         ctx.arc(X, Y, 2, 0, 2 * Math.PI);
+         ctx.fillStyle = breaks;
+         ctx.fill();
+         ctx.closePath();
+       }
+       i++;
+    }
+
+    // Nulls
     i = 0;
     for(let x = this.xmin; x < this.xmax; x += dx) {
       X = (x-this.xmin)*S1;
@@ -118,30 +175,39 @@ class Grafics1d {
       i++;
     }
 
-    i = 0;
-    for(let x = this.xmin; x < this.xmax; x += dx) {
-      X = (x-this.xmin)*S1;
-      if((this.Float64Array[i] > this.ymax / 16 && this.Float64Array[i + 1] < this.ymin / 16) ||
-        (this.Float64Array[i] < this.ymin / 16 && this.Float64Array[i + 1] > this.ymax / 16)) {
-        ctx.beginPath();
-        X = (x-this.xmin)*S1;
-        Y = (0-this.ymin)*S2+this.H;
-        ctx.arc(X, Y, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = breaks;
-        ctx.fill();
-        ctx.closePath();
-      }
-      i++;
-    }
+    // Text
     ctx.fillStyle = 'white';
-    ctx.font = "30px bold";
-    let s1 ='(' + this.xmin + ', ' + this.ymin + ')', s2 = '(' + this.xmax + ', ' + this.ymax + ')';
+    ctx.font = "20px bold";
+    let xmax1 = this.xmax;
+    let ymax1 = this.ymax;
+    let xmaxNumber = 0;
+    let ymaxNumber = 0;
+    while(xmax1 >= 1) {
+      xmax1 /= 10;
+      xmaxNumber++;
+    }
+    while(ymax1 >= 1) {
+      ymax1 /= 10;
+      ymaxNumber++;
+    }
+    let Numbers = xmaxNumber + ymaxNumber;
+    let s1 ='(' + this.xmin.toFixed(3) + ', ' + this.ymin.toFixed(3) + ')',
+      s2 = '(' + this.xmax.toFixed(3) + ', ' + this.ymax.toFixed(3) + ')';
     ctx.fillText(s1, 0, this.H - 10);
-    ctx.fillText(s2, this.W - 100, 30);
+    ctx.fillText(s2, this.W - Numbers * 9 - 120, 20);
+    let changedScaleInX = 'X-Axis scale - ' + ((T1 < 1) ? 1 : T1).toString() + ':' + ((T1 < 1) ? 1/T1 : 1).toString(),
+      changedScaleInY = 'Y-Axis scale - ' + ((T2 < 1) ? 1 : T2).toString() + ':' + ((T2 < 1) ? 1/T2 : 1).toString();
+    ctx.fillText(changedScaleInX, 5, 20);
+    ctx.fillText(changedScaleInY, 5, 50);
   }
 }
-let grafic = new Grafics1d(-10, 10, -10, 10, 800, 600);
-grafic.evaluate();
-// grafic.autodraw();
-grafic.draw();
-
+function printPicture () {
+  grafic = new Grafics1d(Number(document.getElementById('xmin').value), Number(document.getElementById('xmax').value),Number(document.getElementById('ymin').value), Number(document.getElementById('ymax').value),Number(document.getElementById('width').value), Number(document.getElementById('height').value));
+  grafic.evaluate();
+  grafic.draw();
+}
+function Autodraw(grafic) {
+  grafic.autodraw();
+  document.getElementById('ymax').value = grafic.ymax;
+  document.getElementById('ymin').value = grafic.ymin;
+}
